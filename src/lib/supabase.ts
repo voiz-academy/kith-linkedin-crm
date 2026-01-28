@@ -1,9 +1,23 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create a singleton supabase client, handling the case where env vars aren't available at build time
+let supabaseInstance: SupabaseClient | null = null
+
+export const supabase = (() => {
+  if (supabaseInstance) return supabaseInstance
+
+  // During static build, env vars may not be available
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // Return a mock client that will be replaced at runtime
+    return createClient('https://placeholder.supabase.co', 'placeholder-key')
+  }
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey)
+  return supabaseInstance
+})()
 
 export type OutreachStatus = 'not_contacted' | 'request_sent' | 'connected' | 'replied' | 'meeting_scheduled'
 
