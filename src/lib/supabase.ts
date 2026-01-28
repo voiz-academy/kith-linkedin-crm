@@ -5,6 +5,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export type OutreachStatus = 'not_contacted' | 'request_sent' | 'connected' | 'replied' | 'meeting_scheduled'
+
 export type Contact = {
   id: string
   name: string
@@ -18,15 +20,20 @@ export type Contact = {
   engagement_score: number
   total_score: number
   status: 'hot' | 'sql' | 'mql' | 'nurture'
+  outreach_status: OutreachStatus
   assigned_to: string | null
   connection_note_type: string | null
   notes: string | null
   last_contact_date: string | null
   created_at: string
   updated_at: string
+  // From view joins
   company_name?: string
   employee_count?: number
   industry?: string
+  engagement_count?: number
+  last_engagement?: string
+  engaged_with_authors?: string[]
 }
 
 export type Company = {
@@ -50,4 +57,12 @@ export type Engagement = {
   source_topic: string | null
   points_awarded: number | null
   observed_at: string
+}
+
+export const OUTREACH_STATUS_LABELS: Record<OutreachStatus, string> = {
+  not_contacted: 'Not Contacted',
+  request_sent: 'Request Sent',
+  connected: 'Connected',
+  replied: 'Replied',
+  meeting_scheduled: 'Meeting Set',
 }
