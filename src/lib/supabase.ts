@@ -1,20 +1,13 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Hardcode for static build - these are safe to expose (RLS protects the data)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://xihmkiapotzmeyqddqem.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_4j2maVR145Cv0ASm5_ppXA_J93HAs1i'
 
-// Create a singleton supabase client, handling the case where env vars aren't available at build time
 let supabaseInstance: SupabaseClient | null = null
 
 export const supabase = (() => {
   if (supabaseInstance) return supabaseInstance
-
-  // During static build, env vars may not be available
-  if (!supabaseUrl || !supabaseAnonKey) {
-    // Return a mock client that will be replaced at runtime
-    return createClient('https://placeholder.supabase.co', 'placeholder-key')
-  }
-
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey)
   return supabaseInstance
 })()
